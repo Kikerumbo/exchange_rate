@@ -1,0 +1,24 @@
+{
+  "name": "exchange_rate",
+  "version": "1.0.0",
+  "description": "exchange_rate",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "browser-sync start --server www --files www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kikerumbo/exchange_rate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kikerumbo/exchange_rate/issues"
+  },
+  "homepage": "https://github.com/Kikerumbo/exchange_rate#readme",
+  "devDependencies": {
+    "browser-sync": "^2.26.7"
+  }
+}

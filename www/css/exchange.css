@@ -1,0 +1,27 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: rebeccapurple;
+  margin: 2rem 2rem;
+  color: gold;
+}
+
+header h1 {
+  text-align: center;
+  text-transform: uppercase;
+  font-family: sans-serif;
+}
+
+header h2 {
+  text-align: center;
+}
+
+main form fieldset {
+  display: flexbox;
+  justify-content: center;
+  align-items: center;
+}

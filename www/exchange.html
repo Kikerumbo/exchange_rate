@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exchange rate</title>
+
+    <link rel="stylesheet" href="/css/exchange.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Currency conversor</h1>
+      <h2>by Kike</h2>
+    </header>
+    <main>
+      <form>
+        <fieldset class="toConvert">
+          <label for="toConvert">Amount</label>
+          <input type="text" name="toConvert" id="toConvert" />
+          <select name="currency" id="currencyToConvert"> </select>
+        </fieldset>
+
+        <button>Convert</button>
+
+        <fieldset class="converted">
+          <label for="">Amount to</label>
+          <input type="number" name="converted" id="converted" />
+          <select name="currency" id="currencyConverted"> </select>
+        </fieldset>
+      </form>
+    </main>
+
+    <script src="/js/exchange.js"></script>
+  </body>
+</html>
