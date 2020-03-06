@@ -7,6 +7,8 @@ const selectBox = [];
 selectBox[0] = document.querySelector('select#currencyToConvert');
 selectBox[1] = document.querySelector('select#currencyConverted');
 
+const form = document.querySelector('form');
+
 // Get info from API
 async function getAPIinfo(url, selectedBox) {
   const infoFromAPIArray = [];
@@ -18,9 +20,6 @@ async function getAPIinfo(url, selectedBox) {
   for (const currency in infoFromAPIArray[0].rates) {
     objectWithExchangeRates[currency] = infoFromAPIArray[0].rates[currency];
   }
-
-  //console.log(objectWithExchangeRates);
-  //console.log(selectBox);
 
   if (flagStarted === false) {
     addOptionsToSelects(objectWithExchangeRates, selectBox[0]);
@@ -34,7 +33,7 @@ async function getAPIinfo(url, selectedBox) {
 }
 
 // Add the different currencies to the "selects".
-async function addOptionsToSelects(objectWithExchangeRates, selectBox) {
+async function addOptionsToSelects(objectWithExchangeRates, selectedBox) {
   const fragment = document.createDocumentFragment();
 
   for (const currencyName in objectWithExchangeRates) {
@@ -42,81 +41,79 @@ async function addOptionsToSelects(objectWithExchangeRates, selectBox) {
 
     selectOption.textContent = `${currencyName}`;
     fragment.append(selectOption);
-    selectBox.append(fragment);
   }
+  selectedBox.append(fragment);
 }
 
 // Add values to the select options.
-async function AddValueToSelectOptions(objectWithRates, selectedBox) {
-  /*   for (const currencyName in objectWithRates) {
-    const selectOption = document.createElement('option');
+function AddValueToSelectOptions(objectWithExchangeRates) {
+  const fragmentForValues = document.createDocumentFragment();
 
-    selectOption.setAttribute('value', `${objectWithRates[currencyName]}`);
-    fragment.append(selectOption);
-    selectCurrency2.append(fragment);
-  } */
+  selectBox[1].innerHTML = ' ';
 
-  console.log(selectedBox);
+  for (const currencyName in objectWithExchangeRates) {
+    const selectOptionForValues = document.createElement('option');
 
-  for (const currencyName in objectWithRates) {
-    const selectOption = document.createElement('option');
-    const fragment = document.createDocumentFragment();
-
-    selectOption.setAttribute('value', `${objectWithRates[currencyName]}`);
-    fragment.append(selectOption);
-    selectedBox.append(fragment);
+    selectOptionForValues.textContent = `${currencyName}`;
+    selectOptionForValues.setAttribute(
+      'value',
+      `${objectWithExchangeRates[currencyName]}`
+    );
+    fragmentForValues.append(selectOptionForValues);
   }
+  selectBox[1].append(fragmentForValues);
 }
 
 // Do the conversion.
-function doConversion(arrayOfRates) {
-  const selectToConvert = document.querySelector('select#currencyToConvert');
-  const selectConverted = document.querySelector('select#currencyConverted');
+function doConversion(event) {
   const textBoxToConvert = document.querySelector('input#toConvert');
   const textBoxConverted = document.querySelector('input#converted');
-  const form = document.querySelector('form');
 
-  form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    if (isNaN(textBoxToConvert.value)) {
-      alert('It should be a number');
-      textBoxToConvert.value = '';
-      throw new Error('It should be a number!');
-    } else {
-      const textBoxToConvertValue = Number(textBoxToConvert.value);
-      textBoxToConvert.value = '';
+  event.preventDefault();
 
-      const convertedCurrency = selectConverted.value * textBoxToConvertValue;
+  if (isNaN(textBoxToConvert.value)) {
+    alert('It should be a number');
+    textBoxToConvert.value = '';
+    throw new Error('It should be a number!');
+  } else {
+    const textBoxToConvertValue = Number(textBoxToConvert.value);
+    const originalCurrency = selectBox[0].value;
+    textBoxToConvert.value = '';
 
-      textBoxConverted.value = `${convertedCurrency.toFixed(2)}`;
+    console.log(textBoxToConvertValue);
+    console.log(originalCurrency);
+    console.log(selectBox[1]);
 
-      console.log(`Converted value: ${convertedCurrency}`);
-    }
-  });
+    const convertedCurrency =
+      selectBox[1][originalCurrency].value * textBoxToConvertValue;
+
+    textBoxConverted.value = `${convertedCurrency.toFixed(2)}`;
+
+    console.log(`Converted value: ${convertedCurrency}`);
+  }
 }
 
-// *************************
+//*************************
 
 getAPIinfo(exchangeUrl);
 
+// EventListener for the selectBox 1
 selectBox[0].addEventListener('change', (event) => {
   const eventCurrencySelected =
     selectBox[0].options[selectBox[0].selectedIndex].text;
-
-  /* console.log(
-    `Evento: ${selectBox[0].options[selectBox[0].selectedIndex].text}`
-  ); */
-
-  console.log(`Evento: ${eventCurrencySelected}`);
 
   const urlEvento = `https://api.exchangerate-api.com/v4/latest/${eventCurrencySelected}`;
   getAPIinfo(urlEvento, selectBox[0]);
 });
 
+// EventListener for the selectBox 2
 selectBox[1].addEventListener('change', (event) => {
   const eventCurrencySelected =
-    selectBox[0].options[selectBox[0].selectedIndex].text;
+    selectBox[0].options[selectBox[1].selectedIndex].text;
 
   const urlEvento = `https://api.exchangerate-api.com/v4/latest/${eventCurrencySelected}`;
   getAPIinfo(urlEvento, selectBox[1]);
 });
+
+// EventListener for the button
+form.addEventListener('submit', (event) => doConversion(event));
