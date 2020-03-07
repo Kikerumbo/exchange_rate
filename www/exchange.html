@@ -15,19 +15,22 @@
     <main>
       <form>
         <fieldset class="toConvert">
-          <label for="toConvert">Amount</label>
           <input type="text" name="toConvert" id="toConvert" />
           <select name="currency" id="currencyToConvert"> </select>
         </fieldset>
 
-        <button>Convert</button>
+        <p>convert to...</p>
 
         <fieldset class="converted">
-          <label for="">Amount to</label>
-          <input type="number" name="converted" id="converted" />
           <select name="currency" id="currencyConverted"> </select>
+          <button>Convert</button>
         </fieldset>
       </form>
+
+      <section id="conversion">
+        <p id="result"></p>
+        <p id="rate"></p>
+      </section>
     </main>
 
     <script src="/js/exchange.js"></script>

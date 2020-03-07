@@ -2,6 +2,7 @@
 
 const exchangeUrl = 'https://api.exchangerate-api.com/v4/latest/EUR';
 let flagStarted = false;
+let eventFlag = false;
 
 const selectBox = [];
 selectBox[0] = document.querySelector('select#currencyToConvert');
@@ -10,7 +11,7 @@ selectBox[1] = document.querySelector('select#currencyConverted');
 const form = document.querySelector('form');
 
 // Get info from API
-async function getAPIinfo(url, selectedBox) {
+async function getAPIinfo(url) {
   const infoFromAPIArray = [];
   const objectWithExchangeRates = {};
   const infoFromAPI = await fetch(url);
@@ -22,98 +23,74 @@ async function getAPIinfo(url, selectedBox) {
   }
 
   if (flagStarted === false) {
-    addOptionsToSelects(objectWithExchangeRates, selectBox[0]);
-    addOptionsToSelects(objectWithExchangeRates, selectBox[1]);
+    addOptionsToSelects(objectWithExchangeRates);
+    addOptionsToSelects(objectWithExchangeRates);
     flagStarted = true;
+
+    return;
   }
 
-  if (selectedBox) {
-    AddValueToSelectOptions(objectWithExchangeRates, selectedBox);
-  }
+  return objectWithExchangeRates;
 }
 
 // Add the different currencies to the "selects".
-async function addOptionsToSelects(objectWithExchangeRates, selectedBox) {
+function addOptionsToSelects(objectWithExchangeRates) {
   const fragment = document.createDocumentFragment();
 
-  for (const currencyName in objectWithExchangeRates) {
-    const selectOption = document.createElement('option');
+  for (let i = 0; i < 2; i++) {
+    for (const currencyName in objectWithExchangeRates) {
+      const selectOption = document.createElement('option');
 
-    selectOption.textContent = `${currencyName}`;
-    fragment.append(selectOption);
+      selectOption.textContent = `${currencyName}`;
+      fragment.append(selectOption);
+    }
+    selectBox[i].append(fragment);
   }
-  selectedBox.append(fragment);
-}
-
-// Add values to the select options.
-function AddValueToSelectOptions(objectWithExchangeRates) {
-  const fragmentForValues = document.createDocumentFragment();
-
-  selectBox[1].innerHTML = ' ';
-
-  for (const currencyName in objectWithExchangeRates) {
-    const selectOptionForValues = document.createElement('option');
-
-    selectOptionForValues.textContent = `${currencyName}`;
-    selectOptionForValues.setAttribute(
-      'value',
-      `${objectWithExchangeRates[currencyName]}`
-    );
-    fragmentForValues.append(selectOptionForValues);
-  }
-  selectBox[1].append(fragmentForValues);
 }
 
 // Do the conversion.
-function doConversion(event) {
+async function doConversion(event) {
   const textBoxToConvert = document.querySelector('input#toConvert');
   const textBoxConverted = document.querySelector('input#converted');
+  const sectionConversionP1 = document.querySelector(
+    'section#conversion p#result'
+  );
+  const sectionConversionP2 = document.querySelector(
+    'section#conversion p#rate'
+  );
 
   event.preventDefault();
 
+  // Save the currency name selected in the first <select>
+  const eventCurrencySelected =
+    selectBox[0].options[selectBox[0].selectedIndex].text;
+
+  const urlEvento = `https://api.exchangerate-api.com/v4/latest/${eventCurrencySelected}`;
+  const exchageRateArray = await getAPIinfo(urlEvento);
+
+  // Check if the content of the <input> is a number, and if not, throw an error and empty it
   if (isNaN(textBoxToConvert.value)) {
     alert('It should be a number');
     textBoxToConvert.value = '';
     throw new Error('It should be a number!');
   } else {
     const textBoxToConvertValue = Number(textBoxToConvert.value);
-    const originalCurrency = selectBox[0].value;
     textBoxToConvert.value = '';
 
-    console.log(textBoxToConvertValue);
-    console.log(originalCurrency);
-    console.log(selectBox[1]);
+    let convertedCurrency =
+      exchageRateArray[selectBox[1].value] * textBoxToConvertValue;
+    convertedCurrency = convertedCurrency.toFixed(2);
 
-    const convertedCurrency =
-      selectBox[1][originalCurrency].value * textBoxToConvertValue;
-
-    textBoxConverted.value = `${convertedCurrency.toFixed(2)}`;
-
-    console.log(`Converted value: ${convertedCurrency}`);
+    sectionConversionP1.textContent = `${textBoxToConvertValue} ${eventCurrencySelected} ===> ${convertedCurrency} ${selectBox[1].value}`;
+    sectionConversionP2.textContent = `(1 ${eventCurrencySelected} = ${
+      exchageRateArray[selectBox[1].value]
+    } ${selectBox[1].value})`;
   }
 }
 
 //*************************
 
 getAPIinfo(exchangeUrl);
-
-// EventListener for the selectBox 1
-selectBox[0].addEventListener('change', (event) => {
-  const eventCurrencySelected =
-    selectBox[0].options[selectBox[0].selectedIndex].text;
-
-  const urlEvento = `https://api.exchangerate-api.com/v4/latest/${eventCurrencySelected}`;
-  getAPIinfo(urlEvento, selectBox[0]);
-});
-
-// EventListener for the selectBox 2
-selectBox[1].addEventListener('change', (event) => {
-  const eventCurrencySelected =
-    selectBox[0].options[selectBox[1].selectedIndex].text;
-
-  const urlEvento = `https://api.exchangerate-api.com/v4/latest/${eventCurrencySelected}`;
-  getAPIinfo(urlEvento, selectBox[1]);
-});
 
 // EventListener for the button
 form.addEventListener('submit', (event) => doConversion(event));
